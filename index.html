@@ -1,11 +1,10 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Memory Gift ❤️</title>
-
+  <link rel="icon" type="image/png" href="images/heart.png">
+  <title>Ravi - Priyanka ❤️</title>
   <style>
     body {
       margin: 0;
@@ -439,6 +438,7 @@
       if (currentQuestion < questions.length) {
         loadQuestion();
       } else {
+        localStorage.setItem("quiz_completed", "true");
         showResult();
       }
     };
@@ -455,8 +455,18 @@
       nextBtn.style.display = "none";
     }
 
-    // Start quiz
-    loadQuestion();
+
+    function checkIfAlreadyCompleted() {
+      const completed = localStorage.getItem("quiz_completed");
+
+      if (completed === "true") {
+          showResult();
+      } else {
+          loadQuestion();
+      }
+  }
+
+  window.addEventListener("load", checkIfAlreadyCompleted);
 
 
   </script>
