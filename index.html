@@ -10,17 +10,15 @@
     body {
       margin: 0;
       overflow: hidden;
-      background: linear-gradient(to bottom, #0f2027, #203a43, #2c5364);
       font-family: sans-serif;
       cursor: pointer;
     }
 
     h1 {
-      position: absolute;
       width: 100%;
       text-align: center;
       top: 30px;
-      color: white;
+      color: #ff4d6d;
       z-index: 2;
       animation: fadeIn 3s ease-in-out;
     }
@@ -61,7 +59,6 @@
       left: 0;
       width: 100%;
       height: 100%;
-      background: linear-gradient(to bottom, #1a1a2e, #16213e);
       display: flex;
       justify-content: center;
       align-items: center;
@@ -97,6 +94,68 @@
         content: "...";
       }
     }
+
+    #quizContainer {
+      position: fixed;
+      bottom: 40px;
+      width: 100%;
+      display: flex;
+      justify-content: center;
+      z-index: 5;
+    }
+
+    .quiz-card {
+      background: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(20px);
+      padding: 20px;
+      border-radius: 15px;
+      width: 90%;
+      max-width: 400px;
+      color: #ff4d6d;
+      text-align: center;
+      box-shadow: 0 0 20px rgba(255, 105, 180, 0.5);
+      margin: 10px;
+    }
+
+    .quiz-card h2 {
+      font-size: 1.2rem;
+    }
+
+    .option-btn {
+      display: block;
+      margin: 10px 0;
+      padding: 10px;
+      border-radius: 8px;
+      border: none;
+      background: rgba(255, 255, 255, 0.2);
+      color: #ff4d6d;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+
+    .option-btn:hover {
+      background: rgba(255, 105, 180, 0.5);
+      color: white;
+    }
+
+    .option-selected {
+      background: #ff4d6d !important;
+      color: white;
+    }
+
+    #nextBtn {
+      margin-top: 10px;
+      padding: 8px 15px;
+      border: none;
+      border-radius: 8px;
+      background: #ff4d6d;
+      color: white;
+      cursor: pointer;
+    }
+
+    .is-hide {
+      display: none !important;
+    }
   </style>
 </head>
 
@@ -106,13 +165,21 @@
   </div>
   <canvas id="heartCanvas"></canvas>
   <audio id="bgMusic" src="audio/DekhaHiNahi.mp3" preload="auto"></audio>
+  <div id="quizContainer" class="quiz-hidden is-hide">
+    <div class="quiz-card">
+      <h2 id="questionText"></h2>
+      <div id="optionsContainer"></div>
+      <button id="nextBtn" disabled>Next</button>
+    </div>
+  </div>
+
   <script>
 
     /* ===========================
        Random Image Circular Reveal
     =========================== */
 
-    alert("Click Anywhere");
+    let userClicks = 0;
 
     const imagePaths = [
       "images/image-1.jpg",
@@ -191,6 +258,13 @@
           allImages[0].remove();
         }
       }, 1500);
+
+      userClicks++;
+      console.log(userClicks);
+
+      if ((userClicks % 5) === 0) {
+        document.getElementById("quizContainer").classList.remove("is-hide");
+      }
     });
 
     const preloadedImages = [];
@@ -206,6 +280,7 @@
           loadedCount++;
           if (loadedCount === imagePaths.length) {
             hideLoader();
+            alert("Click anywhere for magic !!");
           }
         };
 
@@ -288,6 +363,101 @@
     }
 
     animate();
+
+    const questions = [
+      {
+        question: "Aap logo ne ek dusre ke saath, abhi tak almost kitne hrs baat kar li hogi?",
+        options: [
+          { text: "5 hrs", value: 500 },
+          { text: "10 hrs", value: 1000 },
+          { text: "15 hrs", value: 2000 },
+          { text: "We stop counting long time ago ❤️", value: 5000 }
+        ]
+      },
+      {
+        question: "Shaadi k din se pahle, ek dusre se kitni baar mil chuke ho?",
+        options: [
+          { text: "Only 1", value: 1000 },
+          { text: "3 baar", value: 3000 },
+          { text: "Pure 5 baar", value: 4000 },
+          { text: "5+ 🌹", value: 5000 }
+        ]
+      },
+      {
+        question: "Bhabhi ji, Ravi ne kitni baar aapko gift diya",
+        options: [
+          { text: "Ek baar bhi nhi 😕,", value: 1000 },
+          { text: "Couple of times 💕", value: 3000 },
+          { text: "He himself is ❣️", value: 5000 }
+        ]
+      }
+    ];
+
+    let currentQuestion = 0;
+    let selectedValue = null;
+
+    const questionText = document.getElementById("questionText");
+    const optionsContainer = document.getElementById("optionsContainer");
+    const nextBtn = document.getElementById("nextBtn");
+
+    function loadQuestion() {
+      selectedValue = null;
+      nextBtn.disabled = true;
+      optionsContainer.innerHTML = "";
+
+      const q = questions[currentQuestion];
+      questionText.innerText = q.question;
+
+      q.options.forEach((option, index) => {
+        const btn = document.createElement("button");
+        btn.innerText = option.text;
+        btn.classList.add("option-btn");
+
+        btn.onclick = () => {
+          document.querySelectorAll(".option-btn").forEach(b =>
+            b.classList.remove("option-selected")
+          );
+          btn.classList.add("option-selected");
+
+          selectedValue = option.value;
+          nextBtn.disabled = false;
+        };
+
+        optionsContainer.appendChild(btn);
+      });
+    }
+
+    nextBtn.onclick = () => {
+      // Save answer
+      localStorage.setItem(
+        "question_" + currentQuestion,
+        selectedValue
+      );
+
+      currentQuestion++;
+
+      if (currentQuestion < questions.length) {
+        loadQuestion();
+      } else {
+        showResult();
+      }
+    };
+
+    function showResult() {
+      let total = 0;
+
+      for (let i = 0; i < questions.length; i++) {
+        total += parseInt(localStorage.getItem("question_" + i)) || 0;
+      }
+
+      questionText.innerText = "Your Gift Amount is ₹ " + total;
+      optionsContainer.innerHTML = "";
+      nextBtn.style.display = "none";
+    }
+
+    // Start quiz
+    loadQuestion();
+
 
   </script>
 </body>
