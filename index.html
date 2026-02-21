@@ -155,6 +155,12 @@
     .is-hide {
       display: none !important;
     }
+
+    #optionsContainer {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
   </style>
 </head>
 
@@ -368,30 +374,50 @@
 
     const questions = [
       {
+        question: "Priye Bhabhi Ji aur Ravi, Aaj aapki zindagi ka sabse khubsurat chapter shuru ho raha hai. Hum gift to bahut soch rahe the... Lekin phir laga ki aapki kahani he sabse bada gift hai. So let's start -",
+         options: [],
+      },
+      {
         question: "Aapki sabse lambi call kitne ghante chale thi?",
         options: [
-          { text: "1", value: 500 },
-          { text: "1-3", value: 1000 },
-          { text: "3-5", value: 2000 },
-          { text: "5+", value: 5000 }
+          { text: "1", value: 1 },
+          { text: "2", value: 2 },
+          { text: "3", value: 3 },
+          { text: "4", value: 4 },
+          { text: "5", value: 5 },
+          { text: "6", value: 6 },
+          { text: "7", value: 7 },
+          { text: "8", value: 8 },
+          { text: "9", value: 9 },
+          { text: "9+", value: 9 },
         ]
       },
       {
         question: "Shaadi k din se pahle, ek dusre se kitni baar mil chuke ho?",
         options: [
-          { text: "Only 1", value: 1000 },
-          { text: "3 baar", value: 3000 },
-          { text: "Pure 5 baar", value: 4000 },
-          { text: "5+ 🌹", value: 5000 }
+          { text: "1", value: 1 },
+          { text: "2", value: 2 },
+          { text: "3", value: 3 },
+          { text: "4", value: 4 },
+          { text: "5", value: 5 },
+          { text: "6", value: 6 },
+          { text: "7", value: 7 },
+          { text: "8", value: 8 },
+          { text: "9", value: 9 },
+          { text: "9+", value: 9 },
         ]
       },
       {
-        question: "Kya app ek dusre jhagate ho?",
+        question: "Aap me jagda urf ladaiya hoti h?",
         options: [
-          { text: "Kabhi Nhi,", value: 1000 },
-          { text: "Hafte main ek do baar", value: 3000 },
-          { text: "Bas ek do baar he", value: 5000 }
+          { text: "Kabhi Nhi,", value: 0 },
+          { text: "Hafte main ek do baar", value: 4 },
+          { text: "Bas ek do baar he", value: 9 }
         ]
+      },
+      {
+        question: "Finale time: Aapki story ne hume ek khubshurat number tak pahuchya hai, jo ki aapko last main dikhega. Is special mauke par hum itna kahna chathe hai, Thank You hume aapki is nayi shuruaat ka hissa banane k liye. Aur humara aashirwad aap dono k saath hai.",
+         options: [],
       }
     ];
 
@@ -409,6 +435,10 @@
 
       const q = questions[currentQuestion];
       questionText.innerText = q.question;
+
+      if (q.options?.length === 0) {
+        nextBtn.disabled = false;
+      }
 
       q.options.forEach((option, index) => {
         const btn = document.createElement("button");
@@ -447,13 +477,17 @@
     };
 
     function showResult() {
-      let total = 0;
+      let total = 1;
 
       for (let i = 0; i < questions.length; i++) {
-        total += parseInt(localStorage.getItem("question_" + i)) || 0;
-      }
+        if (localStorage.getItem("question_" + i) !== "null") {
+          total = total * 10 + parseInt(localStorage.getItem("question_" + i));
+        }
 
-      questionText.innerText = "We are wishing you all the best and a lot of happiness for your new step of a life. Things won't be simple and who like simple, right? Enjoy your marriage life. And check your bank statement.";
+      }
+      total *= 10;
+
+      questionText.innerText = "Number - " + total + ". Yah koi amount nhi hai... Balki aapke saath k har pal ki ek choti se jhalak hai. Yah ek chota sa yogdaan hai, aapki nayi zindagi ki mithi shuruaat k naam.";
       optionsContainer.innerHTML = "";
       nextBtn.style.display = "none";
     }
